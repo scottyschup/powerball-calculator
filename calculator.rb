@@ -1,4 +1,4 @@
-require_relative './pbcalc.rb'
+require_relative './powerball.rb'
 
 if __FILE__ == $PROGRAM_NAME
   title = "Powerball Calculator"
@@ -6,7 +6,7 @@ if __FILE__ == $PROGRAM_NAME
   puts "How much is the next jackpot (in millions)?"
   puts "Ex: for $1.5B put '1500'.\n"
   jackpot = gets.chomp.to_i * 1_000_000
-  calc = PowerballCalculator.new(jackpot)
+  calc = Powerball.new(jackpot)
   winnings = format('%.2f', calc.num_combos * calc.average_ticket_value)
   average = format('%.2f', calc.average_ticket_value)
   puts "Total winnings: $#{calc.format_num(winnings)}"
