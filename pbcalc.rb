@@ -13,7 +13,7 @@ class PowerballCalculator
     '5+': { value: 40_000_000, odds: 292_201_338.00 }
   }
   def initialize(jackpot=nil)
-    @jackpot = jackpot || PAYOUTS[:'5+'][:value]
+    @jackpot = taxed(lumped(jackpot || PAYOUTS[:'5+'][:value]))
     @num_combos = calculate_num_combos
   end
 
@@ -24,7 +24,9 @@ class PowerballCalculator
       if key == :'5+'
         winnings += @jackpot
       else
-        winnings += (info[:value] * (@num_combos / info[:odds]))
+        outcome = (info[:value] * (@num_combos / info[:odds]))
+        outcome = taxed(outcome) if info[:value] > 100
+        winnings += outcome
       end
     end
 
@@ -58,15 +60,27 @@ class PowerballCalculator
     elsif payout_key == '5+'
       @jackpot
     else
-      PAYOUTS[payout_key.to_sym][:value]
+      amount = PAYOUTS[payout_key.to_sym][:value]
+      amount > 100 ? taxed(amount) : amount
     end
+  end
+
+  def lumped(num)
+    num * 0.62
+  end
+
+  def taxed(num)
+    num * 0.614
   end
 
   def pick_nums
     nums = (1..69).to_a
-    picks = [nums.sample(5)]
-    picks << (rand(26) + 1)
-    picks
+    picks = nums.sample(5)
+    [picks, (rand(26) + 1)]
+  end
+
+  def format_num(num)
+    num.gsub(/(\d)(?=\d{3}+(?:\.|$))(\d{3}\..*)?/, '\1,\2')
   end
 
   private
@@ -77,7 +91,7 @@ class PowerballCalculator
     pb = 26
     total_combos = 1
 
-    factorial(n) * pb / (factorial(r) * factorial(n- r))
+    factorial(n) * pb / (factorial(r) * factorial(n - r))
   end
 
   def factorial(n)
@@ -89,33 +103,5 @@ class PowerballCalculator
     end
 
     total
-  end
-end
-
-if __FILE__ == $PROGRAM_NAME
-  title = "Powerball Calculator"
-  puts "#{title}\n#{'=' * title.length}"
-  puts "How much is the next jackpot (in millions)?"
-  puts "Ex: for $650,000,000 type '650'. For $1.5B put '1500'.\n"
-  jackpot = gets.chomp.to_i * 1_000_000
-  calc = PowerballCalculator.new(jackpot)
-
-  puts "Total winnings: #{calc.num_combos * calc.average_ticket_value}"
-  puts "Ticket combinations: #{calc.num_combos}"
-  puts "Average ticket value: #{calc.average_ticket_value}\n\n"
-
-  puts "How many tickets would you like to buy?\n"
-  num_tix = gets.chomp.to_i
-  results = calc.simulator(num_tix)
-  puts "Out of #{results[:attempts]} attempts, you won #{results[:wins]} times."
-  puts "Your biggest winning ticket is worth $#{results[:max_win]}."
-  puts "Your total winnings are $#{results[:winnings]}."
-  outcome = results[:outcome] > 0 ? '$' : '-$'
-  outcome += results[:outcome].abs.to_s
-  puts "At $2 per ticket, your net profit is #{outcome}."
-  if results[:outcome] > 0
-    puts "Congrats! You beat the odds!"
-  else
-    puts "Better luck next time :("
   end
 end
