@@ -68,7 +68,7 @@ class Powerball
     num_tix.times do
       this_pick = pick_nums
       result = evaluate(this_pick, winner)
-      next if result < 0
+      next if result <= 0
 
       winnings += result
       wins += 1
