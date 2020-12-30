@@ -4,8 +4,14 @@ With the Powerball jackpot reaching a record-breaking $1.5B, you may be tempted 
 
 ### Usage
 - Open your terminal and navigate to the directory where you want to download the Powerball Calculator repo.
-- Clone the repo `git clone https://github.com/scottyschup/powerball-calculator`.
-- `cd` into the repo `cd powerball-calculator`
+- Clone the repo 
+  ```sh
+  git clone https://github.com/scottyschup/powerball-calculator
+  ```
+- `cd` into the repo
+  ```sh
+  cd powerball-calculator
+  ```
 - Run `ruby calculator.rb` and follow the prompt to see the total possible prize amount and average ticket value (assuming you buy one of each).
 - Run `ruby simulator.rb` and follow the prompts to simulate the thrill of buying large amounts of lottery tickets.
 
